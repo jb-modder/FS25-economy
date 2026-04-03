@@ -20,33 +20,54 @@ const farmData: Record<number, {
 
 function SectionHeader({ title }: { title: string }) {
   return (
-    <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">
+    <h2 className="text-xs font-semibold uppercase tracking-widest text-farm-subtle">
       {title}
     </h2>
   );
 }
 
-function Field({ label, unit, children }: { label: string; unit?: string; children: React.ReactNode }) {
+function InputRow({
+  label,
+  unit,
+  value,
+  onChange,
+}: {
+  label: string;
+  unit?: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
-        {label}{unit && <span className="text-gray-400 font-normal ml-1">({unit})</span>}
-      </label>
-      {children}
+    <div className="flex items-center justify-between gap-4">
+      <label className="text-sm text-farm-muted shrink-0 w-32 sm:w-44">{label}</label>
+      <div className="relative flex-1">
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="bg-farm-input border border-farm-border rounded-md px-3 py-2 w-full text-sm text-farm-text
+                     hover:border-farm-subtle focus:outline-none focus:border-farm-accent-dim transition-colors"
+        />
+        {unit && (
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-farm-subtle pointer-events-none">
+            {unit}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
 
 function ResultRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between py-2 border-b border-gray-100 last:border-0">
-      <span className="text-sm text-gray-600">{label}</span>
-      <span className="text-sm font-medium text-gray-900">{value}</span>
+    <div className="flex justify-between items-baseline py-2.5 border-b border-farm-border last:border-0">
+      <span className="text-xs text-farm-muted">{label}</span>
+      <span className="text-base font-semibold" style={{ color: "#d1d5db" }}>{value}</span>
     </div>
   );
 }
 
-const inputClass = "border border-gray-300 rounded p-2 w-full text-sm focus:outline-none focus:ring-1 focus:ring-gray-400";
+const refRowClass = "grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-farm-subtle pt-2";
 
 export default function Page() {
   const [acres, setAcres] = useState(80);
@@ -68,18 +89,19 @@ export default function Page() {
   const totalCost = seedCost + nitrogenCost + totalOperationCost;
 
   return (
-    <main className="p-8 max-w-2xl mx-auto text-gray-900">
+    <main className="px-4 py-6 sm:px-8 sm:py-10 max-w-2xl mx-auto w-full">
 
-      {/* Header */}
+      {/* Page header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">Field Calculator</p>
-          <h1 className="text-2xl font-bold">Field 1</h1>
+          <p className="text-xs uppercase tracking-widest text-farm-subtle mb-1">Field Calculator</p>
+          <h1 className="text-2xl font-bold text-farm-text">Field 1</h1>
         </div>
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(Number(e.target.value))}
-          className={`${inputClass} w-28`}
+          className="bg-farm-input border border-farm-border rounded-md px-3 py-2 w-28 text-sm text-farm-text
+                     cursor-pointer hover:border-farm-subtle focus:outline-none focus:border-farm-accent-dim transition-colors"
         >
           {Object.keys(farmData).map((year) => (
             <option key={year} value={year}>{year}</option>
@@ -87,44 +109,34 @@ export default function Page() {
         </select>
       </div>
 
-      {/* Inputs */}
-      <div className="space-y-6">
+      {/* Input panels */}
+      <div className="space-y-3">
 
-        {/* General */}
-        <div className="border border-gray-200 rounded p-4 space-y-4">
+        <div className="panel p-4 sm:p-5 space-y-3">
           <SectionHeader title="Field" />
-          <Field label="Acres">
-            <input type="number" value={acres} onChange={(e) => setAcres(Number(e.target.value))} className={inputClass} />
-          </Field>
+          <InputRow label="Acres" unit="ac" value={acres} onChange={setAcres} />
         </div>
 
-        {/* Seed */}
-        <div className="border border-gray-200 rounded p-4 space-y-4">
+        <div className="panel p-4 sm:p-5 space-y-3">
           <SectionHeader title="Seed" />
-          <Field label="Seed Population" unit="seeds/ac">
-            <input type="number" value={seedRate} onChange={(e) => setSeedRate(Number(e.target.value))} className={inputClass} />
-          </Field>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-500 pt-1">
+          <InputRow label="Seed Population" unit="seeds/ac" value={seedRate} onChange={setSeedRate} />
+          <div className={refRowClass}>
             <span>Price per bag</span><span className="text-right">${seedPrice.toFixed(2)}</span>
             <span>Seeds per bag</span><span className="text-right">{seedsPerBag.toLocaleString()}</span>
           </div>
         </div>
 
-        {/* Nitrogen */}
-        <div className="border border-gray-200 rounded p-4 space-y-4">
+        <div className="panel p-4 sm:p-5 space-y-3">
           <SectionHeader title="Nitrogen" />
-          <Field label="Application Rate" unit="lb/ac">
-            <input type="number" value={nitrogenRate} onChange={(e) => setNitrogenRate(Number(e.target.value))} className={inputClass} />
-          </Field>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-500 pt-1">
+          <InputRow label="Application Rate" unit="lb/ac" value={nitrogenRate} onChange={setNitrogenRate} />
+          <div className={refRowClass}>
             <span>Price per lb</span><span className="text-right">${nitrogenPrice.toFixed(2)}</span>
           </div>
         </div>
 
-        {/* Operations */}
-        <div className="border border-gray-200 rounded p-4">
-          <SectionHeader title="Operations (Ohio State Custom Rates)" />
-          <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-500">
+        <div className="panel p-4 sm:p-5 space-y-3">
+          <SectionHeader title="Operations — Ohio State Custom Rates" />
+          <div className={refRowClass}>
             <span>Tillage</span><span className="text-right">${ohioRates.tillage}/ac</span>
             <span>Planting</span><span className="text-right">${ohioRates.planting}/ac</span>
             <span>Spraying</span><span className="text-right">${ohioRates.spraying}/ac</span>
@@ -134,23 +146,31 @@ export default function Page() {
 
       </div>
 
-      {/* Results */}
-      <div className="mt-8 border border-gray-200 rounded p-4">
-        <SectionHeader title="Summary" />
-        <ResultRow label="Total Seeds" value={totalSeeds.toLocaleString() + " seeds"} />
-        <ResultRow label="Seed Bags" value={seedBags.toFixed(2) + " bags"} />
-        <ResultRow label="Seed Cost" value={"$" + seedCost.toFixed(2)} />
-        <ResultRow label="Total Nitrogen" value={totalNitrogen.toLocaleString() + " lbs"} />
-        <ResultRow label="Nitrogen Cost" value={"$" + nitrogenCost.toFixed(2)} />
-        <ResultRow label="Operation Cost" value={"$" + totalOperationCost.toFixed(2)} />
-        <div className="flex justify-between py-3 mt-1 border-t-2 border-gray-300">
-          <span className="text-sm font-semibold text-gray-800">Total Cost</span>
-          <span className="text-sm font-semibold text-gray-900">{"$" + totalCost.toFixed(2)}</span>
+      {/* Summary panel */}
+      <div className="panel mt-4">
+
+        <div className="panel-header">
+          <p className="text-xs font-semibold uppercase tracking-widest text-farm-subtle">Cost Summary</p>
         </div>
-        <div className="flex justify-between pb-1">
-          <span className="text-sm text-gray-500">Cost per Acre</span>
-          <span className="text-sm text-gray-700">{"$" + (totalCost / acres).toFixed(2)}</span>
+
+        <div className="px-4 sm:px-5 py-3">
+          <ResultRow label="Seed Cost"      value={"$" + seedCost.toFixed(2)} />
+          <ResultRow label="Nitrogen Cost"  value={"$" + nitrogenCost.toFixed(2)} />
+          <ResultRow label="Operation Cost" value={"$" + totalOperationCost.toFixed(2)} />
         </div>
+
+        <div className="px-4 sm:px-5 py-4 border-t border-farm-border"
+             style={{ background: "rgba(31, 41, 55, 0.35)" }}>
+          <div className="flex justify-between items-baseline mb-3">
+            <span className="text-xs font-medium text-farm-muted uppercase tracking-widest">Total Cost</span>
+            <span className="text-2xl font-bold text-farm-accent">{"$" + totalCost.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between items-baseline">
+            <span className="text-xs text-farm-subtle">Cost per Acre</span>
+            <span className="text-sm font-semibold text-farm-accent-dim">{"$" + (totalCost / acres).toFixed(2)}</span>
+          </div>
+        </div>
+
       </div>
 
     </main>

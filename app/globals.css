@@ -1,26 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Farm UI palette */
+  --color-farm-bg:           #0b0f14;
+  --color-farm-panel:        #111827;
+  --color-farm-panel-hover:  #162032;
+  --color-farm-border:       #1f2937;
+  --color-farm-border-muted: #161d29;
+  --color-farm-input:        #0f1923;
+
+  --color-farm-text:         #e5e7eb;
+  --color-farm-muted:        #9ca3af;
+  --color-farm-subtle:       #4b5563;
+
+  --color-farm-accent:       #7cff2b;
+  --color-farm-accent-dim:   #4ade80;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #0b0f14;
+  color: #e5e7eb;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Shared card/panel style — use instead of repeating bg/border/rounded classes */
+.panel {
+  background: linear-gradient(160deg, #141e2d 0%, #111827 100%);
+  border: 1px solid #1f2937;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+/* Inset header band inside a panel (e.g. "Cost Summary" bar) */
+.panel-header {
+  border-bottom: 1px solid #1f2937;
+  padding: 1rem 1.25rem 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .panel-header {
+    padding: 0.875rem 1rem 0.625rem;
+  }
 }
